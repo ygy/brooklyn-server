@@ -69,7 +69,6 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
@@ -319,7 +318,7 @@ public class HttpTool {
             return this;
         }
         public HttpClient build() {
-            final DefaultHttpClient httpClient = new DefaultHttpClient(clientConnectionManager);
+            final HttpExecutor httpClient = new HttpExecutorImpl(clientConnectionManager);
             httpClient.setParams(httpParams);
     
             // support redirects for POST (similar to `curl --post301 -L`)

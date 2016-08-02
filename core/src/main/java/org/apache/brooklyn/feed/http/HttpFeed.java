@@ -36,13 +36,13 @@ import org.apache.brooklyn.core.feed.AbstractFeed;
 import org.apache.brooklyn.core.feed.AttributePollHandler;
 import org.apache.brooklyn.core.feed.DelegatingPollHandler;
 import org.apache.brooklyn.core.feed.Poller;
+import org.apache.brooklyn.util.http.HttpExecutor;
 import org.apache.brooklyn.util.http.HttpTool;
 import org.apache.brooklyn.util.http.HttpToolResponse;
 import org.apache.brooklyn.util.http.HttpTool.HttpClientBuilder;
 import org.apache.brooklyn.util.time.Duration;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +126,7 @@ public class HttpFeed extends AbstractFeed {
         private Map<String, String> headers = Maps.newLinkedHashMap();
         private boolean suspended = false;
         private Credentials credentials;
+        private HttpExecutor executor;
         private String uniqueTag;
         private volatile boolean built;
 
@@ -201,6 +202,10 @@ public class HttpFeed extends AbstractFeed {
             if (username != null && password != null) {
                 this.credentials = new UsernamePasswordCredentials(username, password);
             }
+            return this;
+        }
+        public Builder executor(HttpExecutor val) {
+            this.executor = val;
             return this;
         }
         public Builder uniqueTag(String uniqueTag) {
@@ -319,7 +324,7 @@ public class HttpFeed extends AbstractFeed {
             //     threads of execution, it is highly recommended that each thread maintains its
             //     own dedicated instance of HttpContext.
             //  http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html
-            final HttpClient httpClient = createHttpClient(pollInfo);
+            final HttpExecutor httpClient = createHttpClient(pollInfo);
 
             Set<HttpPollConfig<?>> configs = polls.get(pollInfo);
             long minPeriod = Integer.MAX_VALUE;
@@ -359,7 +364,7 @@ public class HttpFeed extends AbstractFeed {
     }
 
     // TODO Should we really trustAll for https? Make configurable?
-    private HttpClient createHttpClient(HttpPollIdentifier pollIdentifier) {
+    private HttpExecutor createHttpClient(HttpPollIdentifier pollIdentifier) {
         URI uri = pollIdentifier.uriProvider.get();
         HttpClientBuilder builder = HttpTool.httpClientBuilder()
                 .trustAll()
@@ -372,7 +377,7 @@ public class HttpFeed extends AbstractFeed {
         if (pollIdentifier.socketTimeout != null) {
             builder.socketTimeout(pollIdentifier.socketTimeout);
         }
-        return builder.build();
+        return (HttpExecutor)builder.build();
     }
 
     @SuppressWarnings("unchecked")
