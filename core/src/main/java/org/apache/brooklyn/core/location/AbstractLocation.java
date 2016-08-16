@@ -72,7 +72,9 @@ import org.apache.brooklyn.util.core.task.DeferredSupplier;
 import org.apache.brooklyn.util.core.task.Tasks;
 import org.apache.brooklyn.util.exceptions.Exceptions;
 import org.apache.brooklyn.util.guava.Maybe;
+import org.apache.brooklyn.util.javalang.Reflections;
 import org.apache.brooklyn.util.stream.Streams;
+import org.apache.brooklyn.util.text.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -716,6 +718,29 @@ public abstract class AbstractLocation extends AbstractBrooklynObject implements
         }
         onChanged();
         return removed;
+    }
+
+    public void init() {
+        super.init();
+
+        loadExtension();
+    }
+
+    public void rebind() {
+        super.rebind();
+
+        loadExtension();
+    }
+
+    private void loadExtension() {
+        String extensionClass = getConfig(LocationConfigKeys.EXTENSION);
+        if (Strings.isNonBlank(extensionClass)) {
+            Reflections reflections = new Reflections(getManagementContext().getCatalogClassLoader());
+            Object extensionObject = reflections.loadInstance(extensionClass);
+            if (extensionObject != null) {
+                extensions.get().put(extensionObject.getClass(), extensionObject);
+            }
+        }
     }
 
     protected void onChanged() {
