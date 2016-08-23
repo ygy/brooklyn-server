@@ -23,7 +23,7 @@ import java.util.Map;
 public interface HttpExecutorFactory {
     public static final String HTTP_EXECUTOR_CLASS = "httpExecutorClass";
 
-    public static final String HTTP_EXECUTOR_CLASS_PROPERTIES_PREFIX = HTTP_EXECUTOR_CLASS + ".";
+    public static final String HTTP_EXECUTOR_CLASS_CONFIG_PREFIX = "httpExecutorClass.";
 
     HttpExecutor getHttpExecutor(Map<?, ?> props);
 }

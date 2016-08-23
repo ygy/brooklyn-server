@@ -295,7 +295,7 @@ public class HttpFeed extends AbstractFeed {
         setConfig(ONLY_IF_SERVICE_UP, builder.onlyIfServiceUp);
         Map<String,String> baseHeaders = ImmutableMap.copyOf(checkNotNull(builder.headers, "headers"));
 
-        HttpExecutor httpExecutor = null;
+        HttpExecutor httpExecutor;
         if (builder.httpExecutor != null) {
             httpExecutor = builder.httpExecutor;
         } else {
@@ -346,7 +346,6 @@ public class HttpFeed extends AbstractFeed {
     @Override
     protected void preStart() {
         SetMultimap<HttpPollIdentifier, HttpPollConfig<?>> polls = getConfig(POLLS);
-
 
         for (final HttpPollIdentifier pollInfo : polls.keySet()) {
             // Though HttpClients are thread safe and can take advantage of connection pooling

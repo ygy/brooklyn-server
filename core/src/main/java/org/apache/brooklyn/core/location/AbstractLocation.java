@@ -721,13 +721,11 @@ public abstract class AbstractLocation extends AbstractBrooklynObject implements
 
     public void init() {
         super.init();
-
         loadExtension();
     }
 
     public void rebind() {
         super.rebind();
-
         loadExtension();
     }
 

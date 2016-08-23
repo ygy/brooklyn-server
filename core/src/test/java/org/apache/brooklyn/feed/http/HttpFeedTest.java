@@ -71,12 +71,12 @@ public class HttpFeedTest extends BrooklynAppUnitTestSupport {
 
     private static final long TIMEOUT_MS = 10*1000;
     
-    private BetterMockWebServer server;
-    private URL baseUrl;
+    protected BetterMockWebServer server;
+    protected URL baseUrl;
     
     protected Location loc;
-    private EntityLocal entity;
-    private HttpFeed feed;
+    protected EntityLocal entity;
+    protected HttpFeed feed;
     
     @BeforeMethod(alwaysRun=true)
     @Override

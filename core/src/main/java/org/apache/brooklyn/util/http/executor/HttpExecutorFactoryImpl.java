@@ -41,15 +41,15 @@ public class HttpExecutorFactoryImpl implements HttpExecutorFactory {
 
     @Override
     public HttpExecutor getHttpExecutor(Map<?, ?> props) {
-        HttpExecutor httpExecutor = null;
+        HttpExecutor httpExecutor;
 
         String httpExecutorClass = (String) props.get(HTTP_EXECUTOR_CLASS);
         if (httpExecutorClass != null) {
-            Map<?, ?> executorProps = Maps.filterKeys(props, StringPredicates.isStringStartingWith(HTTP_EXECUTOR_CLASS_PROPERTIES_PREFIX));
+            Map<?, ?> executorProps = Maps.filterKeys(props, StringPredicates.isStringStartingWith(HTTP_EXECUTOR_CLASS_CONFIG_PREFIX));
             if (executorProps.size() > 0) {
                 Map<String, String> httpExecutorProps = MutableMap.of();
                 for (Entry<?, ?> entry: executorProps.entrySet()) {
-                    String keyName = Strings.removeFromStart((String)entry.getKey(), HTTP_EXECUTOR_CLASS_PROPERTIES_PREFIX);
+                    String keyName = Strings.removeFromStart((String)entry.getKey(), HTTP_EXECUTOR_CLASS_CONFIG_PREFIX);
                     httpExecutorProps.put(keyName, (String)entry.getValue());
                 }
 

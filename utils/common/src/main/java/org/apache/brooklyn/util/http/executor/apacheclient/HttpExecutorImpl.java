@@ -19,6 +19,7 @@
 package org.apache.brooklyn.util.http.executor.apacheclient;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.brooklyn.util.http.HttpTool;
 import org.apache.brooklyn.util.http.HttpTool.HttpClientBuilder;
@@ -58,6 +59,13 @@ public class HttpExecutorImpl implements HttpExecutor {
     }
 
     private final HttpClientBuilder baseBuilder;
+
+    /**
+     * A must have constructor.
+     */
+    public HttpExecutorImpl(Map<?, ?> props) {
+        this(HttpTool.httpClientBuilder());
+    }
     
     protected HttpExecutorImpl(HttpClientBuilder baseBuilder) {
         this.baseBuilder = baseBuilder;
