@@ -65,6 +65,7 @@ import org.apache.brooklyn.core.mgmt.rebind.BasicLocationRebindSupport;
 import org.apache.brooklyn.core.objs.AbstractBrooklynObject;
 import org.apache.brooklyn.core.objs.AbstractConfigurationSupportInternal;
 import org.apache.brooklyn.util.collections.SetFromLiveMap;
+import org.apache.brooklyn.util.core.ClassLoaderUtils;
 import org.apache.brooklyn.util.core.config.ConfigBag;
 import org.apache.brooklyn.util.core.flags.FlagUtils;
 import org.apache.brooklyn.util.core.flags.TypeCoercions;
@@ -72,7 +73,6 @@ import org.apache.brooklyn.util.core.task.DeferredSupplier;
 import org.apache.brooklyn.util.core.task.Tasks;
 import org.apache.brooklyn.util.exceptions.Exceptions;
 import org.apache.brooklyn.util.guava.Maybe;
-import org.apache.brooklyn.util.javalang.Reflections;
 import org.apache.brooklyn.util.stream.Streams;
 import org.apache.brooklyn.util.text.Strings;
 import org.slf4j.Logger;
@@ -735,8 +735,12 @@ public abstract class AbstractLocation extends AbstractBrooklynObject implements
     private void loadExtension() {
         String extensionClass = getConfig(LocationConfigKeys.EXTENSION);
         if (Strings.isNonBlank(extensionClass)) {
-            Reflections reflections = new Reflections(getManagementContext().getCatalogClassLoader());
-            Object extensionObject = reflections.loadInstance(extensionClass);
+            Object extensionObject;
+            try {
+                extensionObject = (Object) new ClassLoaderUtils(this, getManagementContext()).loadClass(extensionClass);
+            } catch (Exception e) {
+                throw Exceptions.propagate(e);
+            }
             if (extensionObject != null) {
                 extensions.get().put(extensionObject.getClass(), extensionObject);
             }

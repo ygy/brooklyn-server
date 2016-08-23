@@ -40,12 +40,13 @@ import org.apache.brooklyn.core.feed.AbstractFeed;
 import org.apache.brooklyn.core.feed.AttributePollHandler;
 import org.apache.brooklyn.core.feed.DelegatingPollHandler;
 import org.apache.brooklyn.core.feed.Poller;
+import org.apache.brooklyn.core.location.Locations;
 import org.apache.brooklyn.core.location.Machines;
 import org.apache.brooklyn.util.guava.Maybe;
-import org.apache.brooklyn.util.http.HttpExecutorFactory;
 import org.apache.brooklyn.util.http.HttpToolResponse;
 import org.apache.brooklyn.util.http.executor.Credentials.BasicAuth;
 import org.apache.brooklyn.util.http.executor.HttpExecutor;
+import org.apache.brooklyn.util.http.executor.HttpExecutorFactory;
 import org.apache.brooklyn.util.http.executor.HttpRequest;
 import org.apache.brooklyn.util.http.executor.HttpResponse;
 import org.apache.brooklyn.util.http.executor.apacheclient.HttpExecutorImpl;
@@ -299,7 +300,7 @@ public class HttpFeed extends AbstractFeed {
             httpExecutor = builder.httpExecutor;
         } else {
             HttpExecutorFactory httpExecutorFactory = null;
-            Collection<Location> locations = builder.entity.getLocations();
+            Collection<? extends Location> locations = Locations.getLocationsCheckingAncestors(builder.entity.getLocations(), builder.entity);
             Maybe<MachineLocation> location =  Machines.findUniqueMachineLocation(locations, MachineLocation.class);
             if (location.isPresent() && location.get().hasExtension(HttpExecutorFactory.class)) {
                 httpExecutorFactory = location.get().getExtension(HttpExecutorFactory.class);
