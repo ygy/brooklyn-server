@@ -89,9 +89,13 @@ public class HttpFeedTest extends BrooklynAppUnitTestSupport {
         server.play();
         baseUrl = server.getUrl("/");
 
-        loc = app.newLocalhostProvisioningLocation();
+        loc = newLocation();
         entity = app.createAndManageChild(EntitySpec.create(TestEntity.class));
         app.start(ImmutableList.of(loc));
+    }
+
+    protected Location newLocation() {
+        return app.newLocalhostProvisioningLocation();
     }
 
     @AfterMethod(alwaysRun=true)
