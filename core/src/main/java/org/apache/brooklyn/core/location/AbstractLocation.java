@@ -74,7 +74,6 @@ import org.apache.brooklyn.util.core.task.Tasks;
 import org.apache.brooklyn.util.exceptions.Exceptions;
 import org.apache.brooklyn.util.guava.Maybe;
 import org.apache.brooklyn.util.stream.Streams;
-import org.apache.brooklyn.util.text.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -733,17 +732,21 @@ public abstract class AbstractLocation extends AbstractBrooklynObject implements
     }
 
     private void loadExtension() {
-        String extensionClass = getConfig(LocationConfigKeys.EXTENSION);
-        if (Strings.isNonBlank(extensionClass)) {
-            Object extensionObject;
-            try {
-                extensionObject = (Object) new ClassLoaderUtils(this, getManagementContext()).loadClass(extensionClass);
-            } catch (Exception e) {
-                throw Exceptions.propagate(e);
+        try {
+            Map<String, String> extensions = getConfig(LocationConfigKeys.EXTENSIONS);
+            if (extensions != null && !extensions.isEmpty()) {
+                for (Map.Entry<String, String> extension: extensions.entrySet()) {
+                    Class<?> extensionClassType =  new ClassLoaderUtils(this, getManagementContext()).loadClass(extension.getKey());
+
+                    if (!hasExtension(extensionClassType)) {
+                        Object extensionClass = new ClassLoaderUtils(this, getManagementContext()).loadClass(extension.getValue()).newInstance();
+                        addExtension((Class)extensionClassType, extensionClass);
+                    }
+                }
             }
-            if (extensionObject != null) {
-                extensions.get().put(extensionObject.getClass(), extensionObject);
-            }
+        } catch (Exception e) {
+            LOG.error("Location extension can not be loaded {}", e);
+            throw Exceptions.propagate(e);
         }
     }
 
