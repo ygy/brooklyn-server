@@ -74,7 +74,7 @@ public class HttpFeedTest extends BrooklynAppUnitTestSupport {
     private BetterMockWebServer server;
     private URL baseUrl;
     
-    private Location loc;
+    protected Location loc;
     private EntityLocal entity;
     private HttpFeed feed;
     

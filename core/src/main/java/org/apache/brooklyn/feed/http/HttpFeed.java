@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.brooklyn.api.entity.EntityLocal;
 import org.apache.brooklyn.api.location.Location;
-import org.apache.brooklyn.api.location.MachineLocation;
 import org.apache.brooklyn.config.ConfigKey;
 import org.apache.brooklyn.core.config.ConfigKeys;
 import org.apache.brooklyn.core.entity.Entities;
@@ -45,6 +44,7 @@ import org.apache.brooklyn.core.location.Machines;
 import org.apache.brooklyn.util.guava.Maybe;
 import org.apache.brooklyn.util.http.HttpToolResponse;
 import org.apache.brooklyn.util.http.executor.Credentials.BasicAuth;
+import org.apache.brooklyn.util.http.executor.HttpConfig;
 import org.apache.brooklyn.util.http.executor.HttpExecutor;
 import org.apache.brooklyn.util.http.executor.HttpExecutorFactory;
 import org.apache.brooklyn.util.http.executor.HttpRequest;
@@ -301,7 +301,7 @@ public class HttpFeed extends AbstractFeed {
         } else {
             HttpExecutorFactory httpExecutorFactory = null;
             Collection<? extends Location> locations = Locations.getLocationsCheckingAncestors(builder.entity.getLocations(), builder.entity);
-            Maybe<MachineLocation> location =  Machines.findUniqueMachineLocation(locations, MachineLocation.class);
+            Maybe<Location> location =  Machines.findUniqueElement(locations, Location.class);
             if (location.isPresent() && location.get().hasExtension(HttpExecutorFactory.class)) {
                 httpExecutorFactory = location.get().getExtension(HttpExecutorFactory.class);
                 Map<String, Object> httpExecutorProps = location.get().getAllConfig(true);
@@ -383,6 +383,11 @@ public class HttpFeed extends AbstractFeed {
                             .credentials(creds)
                             .method(pollInfo.method)
                             .body(pollInfo.body)
+                            .config(HttpConfig.builder()
+                                    .trustSelfSigned(true)
+                                    .trustAll(true)
+                                    .laxRedirect(true)
+                                    .build())
                             .build());
                     return createHttpToolRespose(response);
                 }};
