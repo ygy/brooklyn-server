@@ -79,6 +79,14 @@ public class Poller<V> {
                         } else {
                             handler.onFailure(val);
                         }
+                    } catch (IllegalArgumentException|NullPointerException e) {
+                        if (loggedPreviousException) {
+                            log.debug("PollJob for {}, repeated consecutive failures, handling {} using {}", new Object[] {job, e, handler});
+                        } else {
+                            log.info("PollJob for {} handling {} using {}", new Object[] {job, e, handler});
+                            loggedPreviousException = true;
+                        }
+                        handler.onException(e);
                     } catch (Exception e) {
                         if (loggedPreviousException) {
                             if (log.isTraceEnabled()) log.trace("PollJob for {}, repeated consecutive failures, handling {} using {}", new Object[] {job, e, handler});
